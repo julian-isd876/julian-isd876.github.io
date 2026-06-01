@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Vocab Mastery</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;min-height:100vh}
+#app{max-width:680px;margin:0 auto;padding:16px}
+h1{text-align:center;color:#e94560;margin-bottom:8px}
+#pb{background:#333;height:18px;border-radius:9px;margin:8px 0}
+#pf{height:100%;background:#0f9b58;border-radius:9px;transition:width .4s}
+#pt{text-align:center;font-size:.9em;color:#aaa;margin-bottom:12px}
+#ml{text-align:center;color:#888;font-size:.85em;margin-bottom:8px}
+.card{background:#16213e;border-radius:10px;padding:20px;margin:8px 0}
+.word{font-size:1.8em;font-weight:bold;color:#e94560;text-align:center;margin-bottom:8px}
+.def{font-size:1em;text-align:center;margin-bottom:16px;color:#ccc;line-height:1.4}
+input{width:100%;padding:10px;font-size:1em;border-radius:6px;border:2px solid #333;background:#0f3460;color:#eee;margin:6px 0}
+button{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:.95em;margin:4px}
+.bp{background:#e94560;color:#fff}.bs{background:#0f9b58;color:#fff}.bn{background:#0f3460;color:#fff}
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.kb{padding:18px 12px;font-size:.9em;border-radius:8px;cursor:pointer;border:none;color:#fff;text-align:left;line-height:1.3}
+.k0{background:#e21b3c}.k1{background:#1368ce}.k2{background:#d89e00}.k3{background:#26890c}
+.kb:disabled{opacity:.6;cursor:default}
+.kb.correct-ans{outline:3px solid #fff}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px}
+.mi{padding:10px;background:#0f3460;border-radius:6px;cursor:pointer;border:2px solid transparent;text-align:center;font-size:.85em;line-height:1.3}
+.mi:hover{border-color:#555}
+.mi.sel{border-color:#e94560}
+.mi.mat{background:#0f9b58;cursor:default;border-color:transparent}
+.mi.err{background:#8b0000;cursor:default;border-color:transparent}
+.fb{text-align:center;padding:12px;font-size:1em;border-radius:6px;margin:8px 0;line-height:1.4}
+.fc{background:#0f9b58}.fw{background:#8b0000}
+.stars{font-size:.8em;color:#f0c040;text-align:center;margin-bottom:4px}
+</style></head><body>
+<div id="app">
+<h1>📚 Vocab Mastery</h1>
+<div id="pb"><div id="pf" style="width:0%"></div></div>
+<div id="pt">0% — 0/77 mastered</div>
+<div id="ml"></div>
+<div id="game"></div>
+</div>
+<script>
+const V=[
+{w:"alma mater",d:"a school that a person attended or graduated from"},
+{w:"alumni",d:"people who have graduated from a school, usually college"},
+{w:"commencement",d:"a graduation ceremony marking the beginning of a new phase of life"},
+{w:"pomp and circumstance",d:"elaborate and showy ceremony or display"},
+{w:"mortarboard",d:"the flat square cap with a tassel worn at graduation ceremonies"},
+{w:"orate",d:"to speak formally and eloquently in public"},
+{w:"bias",d:"an unfair preference or prejudice for one side over another"},
+{w:"lucrative",d:"producing a lot of money; profitable"},
+{w:"finagle",d:"to obtain something by trickery or clever manipulation"},
+{w:"cross the Rubicon",d:"to take an action that cannot be reversed; a point of no return"},
+{w:"discord",d:"lack of harmony or agreement; conflict between people"},
+{w:"cacophony",d:"a harsh unpleasant mixture of loud sounds"},
+{w:"juxtaposition",d:"placing two contrasting things side by side to highlight differences"},
+{w:"frisson",d:"a sudden strong feeling of excitement or fear; a shudder or thrill"},
+{w:"tintinnabulation",d:"the ringing or jingling sound of bells"},
+{w:"pitch",d:"a persuasive speech or sales presentation meant to convince someone"},
+{w:"charisma",d:"a compelling personal charm or appeal that attracts others"},
+{w:"tenacity",d:"persistent determination; refusing to give up"},
+{w:"chutzpah",d:"bold nerve or audacity; extreme self-confidence"},
+{w:"acumen",d:"the ability to make good quick judgments; sharpness of mind"},
+{w:"sinister",d:"evil or threatening in appearance; also the Latin word for left"},
+{w:"ambidextrous",d:"able to use both hands equally well"},
+{w:"southpaw",d:"a left-handed person, especially a pitcher or boxer"},
+{w:"gauche",d:"socially awkward or lacking social grace; the French word for left"},
+{w:"impede",d:"to obstruct, hinder, or slow down progress"},
+{w:"kin",d:"family members; relatives"},
+{w:"maternal",d:"relating to a mother or motherly qualities"},
+{w:"paternal",d:"relating to a father or fatherly qualities"},
+{w:"benefactor",d:"a person who gives money or help to others; one who does good"},
+{w:"protege",d:"a person guided and supported in their career by a more experienced person"},
+{w:"vicarious",d:"experienced through the actions or feelings of another person"},
+{w:"sangfroid",d:"calm composure and coolness in difficult or dangerous situations"},
+{w:"lackadaisical",d:"lacking enthusiasm or effort; lazy and careless"},
+{w:"brouhaha",d:"a noisy and overexcited commotion or uproar"},
+{w:"jejune",d:"dull, simplistic, and lacking substance; immature or naive"},
+{w:"schadenfreude",d:"pleasure felt at the misfortune or suffering of others"},
+{w:"nonplussed",d:"so surprised and confused that one does not know how to react"},
+{w:"draconian",d:"extremely harsh or severe, especially referring to laws or punishments"},
+{w:"bailiwick",d:"one's area of special interest, skill, or authority"},
+{w:"toponym",d:"a word or name derived from the name of a place"},
+{w:"brobdingnagian",d:"enormous; gigantic in size"},
+{w:"blarney",d:"smooth flattering talk used to charm or persuade others"},
+{w:"luck",d:"success or failure that happens by chance rather than through one's own actions"},
+{w:"phobia",d:"an irrational persistent and intense fear of something"},
+{w:"donnybrook",d:"a brawl, noisy uproar, or chaotic fight"},
+{w:"Ides of March",d:"March 15th; a day associated with doom, warning, or assassination"},
+{w:"etymology",d:"the study of the origin and historical development of words"},
+{w:"lexicon",d:"the vocabulary of a person, language, or field of knowledge"},
+{w:"eponym",d:"a word named after a specific person"},
+{w:"verbatim",d:"in exactly the same words; word for word"},
+{w:"sophomoric",d:"childishly immature and overconfident; pretentious but uninformed"},
+{w:"sleuth",d:"a detective; someone who investigates and solves crimes"},
+{w:"deduce",d:"to arrive at a conclusion through logical reasoning from evidence"},
+{w:"perpetrator",d:"a person who commits a harmful, illegal, or immoral act"},
+{w:"conundrum",d:"a confusing difficult problem or riddle with no clear solution"},
+{w:"red herring",d:"a misleading clue or distraction that draws attention from the real issue"},
+{w:"unmitigated",d:"absolute and total; not reduced or lessened in any way"},
+{w:"indignant",d:"feeling or showing anger about something perceived as unfair or wrong"},
+{w:"notoriety",d:"being famous for something negative or disreputable"},
+{w:"hypocrite",d:"a person who claims to have beliefs or virtues they do not actually have"},
+{w:"gait",d:"a person's manner or style of walking"},
+{w:"iota",d:"an extremely small amount or degree"},
+{w:"habiliments",d:"clothing or attire, especially for a particular occasion or role"},
+{w:"myopic",d:"nearsighted; lacking foresight or a broad perspective"},
+{w:"elucidate",d:"to explain or make something clear and easy to understand"},
+{w:"benignly",d:"in a gentle, kind, or harmless manner"},
+{w:"chiffarobe",d:"a piece of furniture that combines a wardrobe and chest of drawers"},
+{w:"tenterhooks",d:"in a state of anxious suspense or nervous tension"},
+{w:"Jew's harp",d:"a small musical instrument held between the teeth and played by plucking"},
+{w:"umbrage",d:"offense or resentment at something said or done"},
+{w:"undulate",d:"to move in a smooth wave-like motion"},
+{w:"viscous",d:"thick and sticky; not flowing freely like water"},
+{w:"chattel",d:"personal movable property; things owned by a person"},
+{w:"flivver",d:"an old, small, cheap or broken-down automobile"},
+{w:"entailment",d:"a legal restriction limiting how property can be inherited or transferred"},
+{w:"scuppernongs",d:"a type of large bronze or greenish grape native to the southeastern United States"},
+{w:"tacit",d:"understood or implied without being directly stated"}
+];
+
+const M=new Array(V.length).fill(0);
+const MAX=5;
+const MODES=['flashcard','type-word','type-def','kahoot','truefalse','matching','fill-blank'];
+let mi=0, matchSt=null;
+
+function pct(){return Math.round(M.reduce((a,b)=>a+b,0)/(V.length*MAX)*100)}
+function masteredCount(){return M.filter(x=>x>=MAX).length}
+
+function updateUI(){
+  const p=pct();
+  document.getElementById('pf').style.width=p+'%';
+  document.getElementById('pt').textContent=p+'% — '+masteredCount()+'/'+V.length+' mastered';
+  if(p>=100){
+    document.getElementById('game').innerHTML='<div class="card" style="text-align:center"><div style="font-size:3em">🎉</div><h2 style="color:#0f9b58;margin:12px 0">100% MASTERED!</h2><p>You know all '+V.length+' words!</p><br><button class="bp" onclick="resetAll()">Start Over</button></div>';
+    return true;
+  }
+  return false;
+}
+
+function resetAll(){M.fill(0);mi=0;next()}
+
+function pick(){
+  const un=V.map((_,i)=>i).filter(i=>M[i]<MAX);
+  if(!un.length)return Math.floor(Math.random()*V.length);
+  const w=un.map(i=>MAX-M[i]);
+  const t=w.reduce((a,b)=>a+b,0);
+  let r=Math.random()*t;
+  for(let j=0;j<un.length;j++){r-=w[j];if(r<=0)return un[j];}
+  return un[un.length-1];
+}
+
+function wrongs(ci,n){
+  return V.map((_,i)=>i).filter(i=>i!==ci).sort(()=>Math.random()-.5).slice(0,n);
+}
+
+function defMatch(inp,def){
+  const stop=new Set(['a','an','the','is','are','was','were','of','in','or','and','to','that','it','by','as','at','on','for','with','from','not','be','its','one','two','who']);
+  const tok=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>2&&!stop.has(w));
+  const exp=tok(def), giv=new Set(tok(inp));
+  if(!giv.size)return false;
+  const hits=exp.filter(w=>giv.has(w)||[...giv].some(g=>g.includes(w)||w.includes(g)));
+  return hits.length>=Math.max(1,Math.ceil(exp.length*.32));
+}
+
+function stars(i){return'★'.repeat(M[i])+'☆'.repeat(MAX-M[i])}
+
+function next(){
+  if(updateUI())return;
+  const mode=MODES[mi%MODES.length];
+  document.getElementById('ml').textContent='Mode: '+mode.replace(/-/g,' ').toUpperCase()+' | '+pct()+'%';
+  ({flashcard:showFC,'type-word':showTW,'type-def':showTD,kahoot:showKH,truefalse:showTF,matching:showMT,'fill-blank':showFB})[mode]();
+}
+
+function adv(){mi++;next()}
+function good(i){M[i]=Math.min(MAX,M[i]+1);updateUI()}
+function bad(i){/* no penalty, just no gain */updateUI()}
+
+// FLASHCARD
+function showFC(){
+  const i=pick(),v=V[i];
+  document.getElementById('game').innerHTML=`<div class="card"><div class="stars">${stars(i)}</div><div class="word">${v.w}</div><div id="fcd" style="display:none" class="def">${v.d}</div><div style="text-align:center;margin-top:12px"><button class="bn" onclick="document.getElementById('fcd').style.display='block';document.getElementById('fcb').style.display='block';this.style.display='none'">Show Definition</button><div id="fcb" style="display:none"><button class="bs" onclick="good(${i});adv()">✓ Got it</button><button class="bp" onclick="bad(${i});adv()">✗ Missed</button></div></div></div>`;
+}
+
+// TYPE THE WORD
+function showTW(){
+  const i=pick(),v=V[i];
+  document.getElementById('game').innerHTML=`<div class="card"><p style="color:#aaa;text-align:center;margin-bottom:8px">Given the definition — type the word:</p><div class="def">"${v.d}"</div><input id="twi" placeholder="Type the vocabulary word..." onkeydown="if(event.key==='Enter')chkTW(${i})"><div style="text-align:center"><button class="bp" onclick="chkTW(${i})">Submit</button></div><div id="twf"></div></div>`;
+  document.getElementById('twi').focus();
+}
+function chkTW(i){
+  const inp=document.getElementById('twi').value.trim().toLowerCase();
+  const cor=V[i].w.toLowerCase();
+  const ok=inp===cor||(cor.replace(/[^a-z]/g,'').includes(inp.replace(/[^a-z]/g,''))&&inp.length>3);
+  document.getElementById('twf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Answer: <strong>'+V[i].w+'</strong>'}</div>`;
+  ok?good(i):bad(i);setTimeout(adv,ok?1200:2000);
+}
+
+// TYPE THE DEFINITION
+function showTD(){
+  const i=pick(),v=V[i];
+  document.getElementById('game').innerHTML=`<div class="card"><p style="color:#aaa;text-align:center;margin-bottom:8px">Define this word in your own words:</p><div class="word">${v.w}</div><input id="tdi" placeholder="Type definition..." onkeydown="if(event.key==='Enter')chkTD(${i})"><div style="text-align:center"><button class="bp" onclick="chkTD(${i})">Submit</button></div><div id="tdf"></div></div>`;
+  document.getElementById('tdi').focus();
+}
+function chkTD(i){
+  const inp=document.getElementById('tdi').value.trim();
+  const ok=defMatch(inp,V[i].d);
+  document.getElementById('tdf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Good! Full definition: ':'✗ Definition: '}<em>${V[i].d}</em></div>`;
+  ok?good(i):bad(i);setTimeout(adv,ok?2000:2500);
+}
+
+// KAHOOT
+function showKH(){
+  const i=pick(),v=V[i];
+  const wis=wrongs(i,3);
+  const asWord=Math.random()>.5;
+  let opts;
+  if(asWord){
+    opts=[{i,t:v.d},...wis.map(x=>({i:x,t:V[x].d}))].sort(()=>Math.random()-.5);
+  } else {
+    opts=[{i,t:v.w},...wis.map(x=>({i:x,t:V[x].w}))].sort(()=>Math.random()-.5);
+  }
+  const ci=opts.findIndex(o=>o.i===i);
+  const em=['🔴','🔵','🟡','🟢'];
+  const q=asWord?`What is the definition of: <strong>${v.w}</strong>?`:`Which word matches: <em>"${v.d}"</em>?`;
+  document.getElementById('game').innerHTML=`<div class="card"><div class="def" style="font-size:1.1em">${q}</div><div class="kg">${opts.map((o,j)=>`<button class="kb k${j}" onclick="chkKH(${j},${ci},${i})">${em[j]} ${o.t}</button>`).join('')}</div><div id="khf"></div></div>`;
+}
+function chkKH(ch,cor,wi){
+  document.querySelectorAll('.kb').forEach((b,j)=>{b.disabled=true;if(j===cor)b.classList.add('correct-ans');});
+  const ok=ch===cor;
+  document.getElementById('khf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Wrong — highlighted = correct'}</div>`;
+  ok?good(wi):bad(wi);setTimeout(adv,1500);
+}
+
+// TRUE/FALSE
+function showTF(){
+  const i=pick(),v=V[i];
+  const isT=Math.random()>.35;
+  const disp=isT?v.d:V[wrongs(i,1)[0]].d;
+  document.getElementById('game').innerHTML=`<div class="card"><p style="color:#aaa;text-align:center;margin-bottom:8px">TRUE or FALSE — is this the correct definition?</p><div class="word">${v.w}</div><div class="def">"${disp}"</div><div style="text-align:center"><button class="bs" style="font-size:1.2em;padding:14px 28px" onclick="chkTF(${isT},true,${i})">✓ TRUE</button><button class="bp" style="font-size:1.2em;padding:14px 28px" onclick="chkTF(${isT},false,${i})">✗ FALSE</button></div><div id="tff"></div></div>`;
+}
+function chkTF(cor,usr,i){
+  const ok=cor===usr;
+  document.getElementById('tff').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Wrong!'} Actual: <em>${V[i].d}</em></div>`;
+  ok?good(i):bad(i);setTimeout(adv,2000);
+}
+
+// MATCHING
+function showMT(){
+  const pool=V.map((_,i)=>i).filter(i=>M[i]<MAX);
+  const src=(pool.length>=4?pool:V.map((_,i)=>i)).sort(()=>Math.random()-.5);
+  const idxs=src.slice(0,4);
+  const ws=[...idxs].sort(()=>Math.random()-.5);
+  const ds=[...idxs].sort(()=>Math.random()-.5);
+  matchSt={ws,ds,done:new Set(),sw:null,sd:null};
+  renderMT();
+}
+function renderMT(){
+  const{ws,ds,done,sw,sd}=matchSt;
+  const wh=ws.map((i,j)=>{const c=done.has('w'+j)?'mi mat':sw===j?'mi sel':'mi';return`<div class="${c}" onclick="selMT('w',${j})">${V[i].w}</div>`;}).join('');
+  const dh=ds.map((i,j)=>{const c=done.has('d'+j)?'mi mat':sd===j?'mi sel':'mi';const t=V[i].d.length>55?V[i].d.slice(0,55)+'…':V[i].d;return`<div class="${c}" onclick="selMT('d',${j})">${t}</div>`;}).join('');
+  document.getElementById('game').innerHTML=`<div class="card"><div class="def">Match each word to its definition (click word, then definition):</div><div class="mg"><div style="display:flex;flex-direction:column;gap:6px">${wh}</div><div style="display:flex;flex-direction:column;gap:6px">${dh}</div></div><div id="mtf"></div></div>`;
+}
+function selMT(side,j){
+  if(side==='w'){if(matchSt.done.has('w'+j))return;matchSt.sw=j;}
+  else{if(matchSt.done.has('d'+j))return;matchSt.sd=j;}
+  if(matchSt.sw!==null&&matchSt.sd!==null){
+    const wi=matchSt.sw,di=matchSt.sd;
+    if(matchSt.ws[wi]===matchSt.ds[di]){
+      matchSt.done.add('w'+wi);matchSt.done.add('d'+di);good(matchSt.ws[wi]);
+    } else {bad(matchSt.ws[wi]);}
+    matchSt.sw=null;matchSt.sd=null;
+    renderMT();
+    if(matchSt.done.size===8)setTimeout(adv,600);
+    return;
+  }
+  renderMT();
+}
+
+// FILL IN THE BLANK
+function showFB(){
+  const i=pick(),v=V[i];
+  // blank out a key word from definition
+  const words=v.d.split(' ');
+  // find longest word that's not a stopword
+  const stop=new Set(['a','an','the','is','are','was','were','of','in','or','and','to','that','it','by','as','at','on','for','with','from','not','be']);
+  const candidates=words.map((w,j)=>({w,j,l:w.replace(/[^a-z]/gi,'').length})).filter(x=>x.l>4&&!stop.has(x.w.toLowerCase())).sort((a,b)=>b.l-a.l);
+  if(!candidates.length){showKH();return;}
+  const chosen=candidates[0];
+  const blanked=words.map((w,j)=>j===chosen.j?'_____':w).join(' ');
+  const ans=chosen.w.replace(/[^a-zA-Z]/g,'').toLowerCase();
+  document.getElementById('game').innerHTML=`<div class="card"><p style="color:#aaa;text-align:center;margin-bottom:8px">Fill in the blank:</p><div class="word">${v.w}</div><div class="def">"${blanked}"</div><input id="fbi" placeholder="Type the missing word..." onkeydown="if(event.key==='Enter')chkFB('${ans}',${i})"><div style="text-align:center"><button class="bp" onclick="chkFB('${ans}',${i})">Submit</button></div><div id="fbf"></div></div>`;
+  document.getElementById('fbi').focus();
+}
+function chkFB(ans,i){
+  const inp=document.getElementById('fbi').value.trim().toLowerCase().replace(/[^a-z]/g,'');
+  const ok=inp===ans||ans.startsWith(inp)&&inp.length>3||inp.startsWith(ans)&&ans.length>3;
+  document.getElementById('fbf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Answer: <strong>'+ans+'</strong>'}<br><em>Full: ${V[i].d}</em></div>`;
+  ok?good(i):bad(i);setTimeout(adv,ok?1500:2200);
+}
+
+next();
+</script></body></html>
