@@ -193,7 +193,7 @@ function chkTW(i){
   const cor=V[i].w.toLowerCase();
   const ok=inp===cor||(cor.replace(/[^a-z]/g,'').includes(inp.replace(/[^a-z]/g,''))&&inp.length>3);
   document.getElementById('twf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Answer: <strong>'+V[i].w+'</strong>'}</div>`;
-  ok?good(i):bad(i);setTimeout(adv,ok?1200:2000);
+  ok?good(i):bad(i);setTimeout(adv,ok?500:2000);
 }
 
 // TYPE THE DEFINITION
@@ -206,7 +206,7 @@ function chkTD(i){
   const inp=document.getElementById('tdi').value.trim();
   const ok=defMatch(inp,V[i].d);
   document.getElementById('tdf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Good! Full definition: ':'✗ Definition: '}<em>${V[i].d}</em></div>`;
-  ok?good(i):bad(i);setTimeout(adv,ok?2000:2500);
+  ok?good(i):bad(i);setTimeout(adv,ok?1500:2500);
 }
 
 // KAHOOT
@@ -229,7 +229,7 @@ function chkKH(ch,cor,wi){
   document.querySelectorAll('.kb').forEach((b,j)=>{b.disabled=true;if(j===cor)b.classList.add('correct-ans');});
   const ok=ch===cor;
   document.getElementById('khf').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Wrong — highlighted = correct'}</div>`;
-  ok?good(wi):bad(wi);setTimeout(adv,1500);
+  ok?good(wi):bad(wi);setTimeout(adv,1400);
 }
 
 // TRUE/FALSE
@@ -242,7 +242,7 @@ function showTF(){
 function chkTF(cor,usr,i){
   const ok=cor===usr;
   document.getElementById('tff').innerHTML=`<div class="fb ${ok?'fc':'fw'}">${ok?'✓ Correct!':'✗ Wrong!'} Actual: <em>${V[i].d}</em></div>`;
-  ok?good(i):bad(i);setTimeout(adv,2000);
+  ok?good(i):bad(i);setTimeout(adv,1400);
 }
 
 // MATCHING
